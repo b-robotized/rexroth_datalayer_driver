@@ -1,0 +1,9 @@
+<library path="data_layer_hardware_interface_nrt">
+  <class name="data_layer_hardware_interface/DataLayerHardwareInterface_NRT"
+         type="data_layer_hardware_interface::DataLayerHardwareInterface_NRT"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      ros2_control hardware interface for reading data from the Bosch Rexroth DataLayer (Non-Real-Time).
+    </description>
+  </class>
+</library>

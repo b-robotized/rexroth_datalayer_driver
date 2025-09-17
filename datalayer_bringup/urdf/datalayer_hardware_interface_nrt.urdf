@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- Ctrlx Data Layer Hw Interface -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="datalayer_hardware_interface_nrt">
+
+  <link name="world" />
+  
+  <xacro:include filename="$(find ctrlx_hardware_interface)/ros2_control/ctrlx_hardware_interface_nrt.ros2_control.xacro" />
+
+  <xacro:datalayer_hardware_interface_nrt_ros2_control/>
+
+</robot>

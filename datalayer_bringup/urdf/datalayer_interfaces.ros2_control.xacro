@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+
+    <!--Addresses MUST ommit stating and ending backslash-->
+    
+    <xacro:macro name="state_interface_DataLayer_NRT" params="name DL_address DL_variable">
+        <state_interface name="${name}">
+            <param name="DL_address">${DL_address}</param>
+            <param name="DL_variable">${DL_variable}</param>
+        </state_interface>
+    </xacro:macro>
+
+    <xacro:macro name="command_interface_DataLayer_NRT" params="name initial_value:='' DL_address DL_variable">
+        <command_interface name="${name}">
+            <xacro:if value="${initial_value != ''}">
+                <param name="initial_value">${initial_value}</param>
+            </xacro:if>
+            <param name="DL_address">${DL_address}</param>
+            <param name="DL_variable">${DL_variable}</param>
+        </command_interface>
+    </xacro:macro>
+
+</robot>

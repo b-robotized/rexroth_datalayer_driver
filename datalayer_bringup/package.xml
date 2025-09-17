@@ -3,14 +3,12 @@
 <package format="3">
   <name>datalayer_bringup</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="nikola.banovic@b-robotized.com">b-controlled-box</maintainer>
-  <license>TODO: License declaration</license>
+  <description>Accompanying brungup package with example URDF for datalayer_hardware_interface_nrt</description>
+  <maintainer email="nikola.banovic@b-robotized.com">Nikola Banovic</maintainer>
+  <license>Apache 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-
-  <test_depend>ament_lint_auto</test_depend>
-  <test_depend>ament_lint_common</test_depend>
+  <exec_depend>datalayer_hardware_interface_nrt<exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
