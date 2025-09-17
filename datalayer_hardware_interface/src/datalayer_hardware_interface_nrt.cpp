@@ -1,4 +1,4 @@
-#include "ctrlx_data_layer_hw_interface/ctrlx_data_layer_hw_interface.hpp"
+#include "datalayer_hardware_interface/datalayer_hardware_interface_nrt.hpp"
 
 #include <limits>
 
@@ -22,6 +22,10 @@ hardware_interface::CallbackReturn DataLayerHardwareInterface_NRT::on_configure(
 {
     RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Configuring ...");
 
+    std::string device_ip = info_.hardware_parameters["device_ip"];
+    std::string device_user = info_.hardware_parameters["device_user"];
+    std::string device_password = info_.hardware_parameters["device_password"];
+
     // Beginning of code for ctrlX Data Layer
     // TODO(Manuel) Add setting of initial values
     RCLCPP_INFO(
@@ -31,7 +35,7 @@ hardware_interface::CallbackReturn DataLayerHardwareInterface_NRT::on_configure(
     RCLCPP_INFO(
         rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "DatalayerSystem created. Get connection string.");
 
-    auto connectionString = getConnectionString();
+    auto connectionString = getConnectionString(device_ip, device_user, device_password);
     RCLCPP_INFO(
         rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Connection string is: %s ...", connectionString.c_str());
 
@@ -97,17 +101,13 @@ std::vector<hardware_interface::StateInterface> DataLayerHardwareInterface_NRT::
         const std::string device_name = gpio.name;
         for (auto & state_if : gpio.state_interfaces)
         {
-            std::string address = "";
-            // TODO(Anyone) REMOVE THIS DIRTY DIRTY DRTY HACK!!!!!!!
-            if(device_name == "EL2008")
-            {
-                address = datalayer_base_address +  "output/data/" + device_name + state_if.parameters["variable_name"];
-            } else
-            {
-                address = datalayer_base_address +  datalayer_data_input_ + device_name + state_if.parameters["variable_name"];
-            }
+            std::string dl_address_str = state_if.parameters.at("DL_address");
+            std::string dl_variable_str = state_if.parameters.at("DL_variable");
+            std::string dl_variable_type_str = state_if.parameters.at("DL_variable_type");
 
-            const std::string full_qualified_state_if_name = device_name + "/" + state_if.name;
+            std::string full_address = dl_address_str + "/" + dl_variable_str;
+            const std::string full_qualified_state_if_name = gpio.name + "/" + state_if.name;
+
             // how a full address should look like an example
             // address = fieldbuses/ethercat/master/instances/Beckhof_IOs/realtime_data/input/data/EL1859/Channel_1.Input
             // EL1859/read_di, fieldbuses/ethercat/master/instances/Beckhof_IOs/realtime_data/input/data/EL1859/Channel_1.Input
@@ -117,27 +117,33 @@ std::vector<hardware_interface::StateInterface> DataLayerHardwareInterface_NRT::
             // device_name                          = EL1859
             //state_if.parameters["variable_name"]  = /Channel_1.Input
             
-            if (state_if.data_type == "bool")
+            if (dl_variable_type_str == "BOOL8")
             {
                 auto type = comm::datalayer::VariantType::BOOL8;
                 state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
-                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <bool> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <BOOL8> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
             }
-            else if (state_if.data_type == "int")
+            else if (dl_variable_type_str == "INT64")
             {
                 auto type = comm::datalayer::VariantType::INT64;
                    state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
-                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <int> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <INT64> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
             }
-            else if (state_if.data_type == "double")
+            else if (dl_variable_type_str == "UINT64")
+            {
+                auto type = comm::datalayer::VariantType::UINT64;
+                   state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <UINT64> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
+            }
+            else if (dl_variable_type_str == "FLOAT64")
             {
                 auto type = comm::datalayer::VariantType::FLOAT64;                    
                 state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
-                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <double> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <FLOAT64> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
             }
             else
             {
-                std::string error_msg = std::string("Invalid data type <" + state_if.data_type + "> for StateInteface:" + full_qualified_state_if_name);
+                std::string error_msg = std::string("Invalid data type <" + dl_variable_type_str + "> for StateInteface:" + full_qualified_state_if_name);
                 RCLCPP_ERROR(
                     rclcpp::get_logger("DataLayerHardwareInterface_NRT"), error_msg.c_str());
                 throw std::runtime_error(error_msg);
@@ -163,11 +169,15 @@ std::vector<hardware_interface::CommandInterface> DataLayerHardwareInterface_NRT
     for (hardware_interface::ComponentInfo gpio : info_.gpios)
     {
         // TODO(Manuel) Add setting of initial values
-
-        const std::string device_name = gpio.name;
         for (auto & command_if : gpio.command_interfaces)
-        {
-            const std::string full_qualified_command_if_name = device_name + "/" + command_if.name;
+        {            
+            std::string dl_address_str = command_if.parameters.at("DL_address");
+            std::string dl_variable_str = command_if.parameters.at("DL_variable");
+            std::string dl_variable_type_str = command_if.parameters.at("DL_variable_type");
+            
+            std::string full_address = dl_address_str + "/" + dl_variable_str;
+            const std::string full_qualified_command_if_name = gpio.name + "/" + command_if.name;
+
             // how a full address should look like an example
             // address = fieldbuses/ethercat/master/instances/Beckhof_IOs/realtime_data/input/data/EL1859/Channel_1.Input
             // EL1859/read_di, fieldbuses/ethercat/master/instances/Beckhof_IOs/realtime_data/input/data/EL1859/Channel_1.Input
@@ -176,28 +186,33 @@ std::vector<hardware_interface::CommandInterface> DataLayerHardwareInterface_NRT
             // datalayer_data_input_                = input/data/
             // device_name                          = EL1859
             //state_if.parameters["variable_name"]  = /Channel_1.Input
-            const auto address = datalayer_base_address +  datalayer_data_output_ + device_name + command_if.parameters["variable_name"];
-            if (command_if.data_type == "bool")
+            if (dl_variable_type_str == "BOOL8")
             {
                 auto type = comm::datalayer::VariantType::BOOL8;                   
                 command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
-                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <bool> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <BOOL8> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
             }
-            else if (command_if.data_type == "int")
+            else if (dl_variable_type_str == "INT64")
             {
                 auto type = comm::datalayer::VariantType::INT64;
                 command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
-                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <int> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <INT64> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
             }
-            else if (command_if.data_type == "double")
+            else if (dl_variable_type_str == "UINT64")
+            {
+                auto type = comm::datalayer::VariantType::UINT64;
+                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <UINT64> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
+            }
+            else if (dl_variable_type_str == "FLOAT64")
             {
                 auto type = comm::datalayer::VariantType::FLOAT64;                 
                 command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
-                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <double> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <FLOAT64> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
             }
             else
             {
-                std::string error_msg = std::string("Invalid data type <" + command_if.data_type + "> for CommandInterface:" + full_qualified_command_if_name);
+                std::string error_msg = std::string("Invalid data type <" + dl_variable_type_str + "> for CommandInterface:" + full_qualified_command_if_name);
                 RCLCPP_ERROR(
                     rclcpp::get_logger("DataLayerHardwareInterface_NRT"), error_msg.c_str());
                 throw std::runtime_error(error_msg);

@@ -14,7 +14,7 @@
       </hardware>
 
       <!--Addresses MUST ommit stating and ending backslash-->
-      <gpio name="datalayer/scheduler">
+      <gpio name="datalayer">
         <xacro:state_interface_DataLayer_NRT 
           name="scheduler_counter" DL_address="scheduler/admin/info/common-data-rt" DL_variable="counter" DL_variable_type="UINT64"/>
         <!-- <xacro:comand_interface_DataLayer_NRT initial_value="25000.0"

@@ -178,8 +178,6 @@ protected:
   hardware_interface::return_type read_from_datalayer(const std::string& interface_name, DatalayerType& datalayer_wrapper);
 
 private:
-  comm::datalayer::VariantType variantTypeFromString(const std::string& type_str);
-
   std::unordered_map<std::string, DatalayerType> state_interface_to_states_dl_;
   std::unordered_map<std::string, DatalayerType> command_interface_to_commands_dl_;
 
