@@ -2,9 +2,9 @@
 
 #include <limits>
 
-namespace ctrlx_data_layer_hw_interface
+namespace datalayer_hardware_interface
 {
-hardware_interface::CallbackReturn CtrlxDataLayerHwInterface::on_init(
+hardware_interface::CallbackReturn DataLayerHardwareInterface_NRT::on_init(
     const hardware_interface::HardwareInfo &info)
 {
     if (
@@ -17,42 +17,42 @@ hardware_interface::CallbackReturn CtrlxDataLayerHwInterface::on_init(
     return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-hardware_interface::CallbackReturn CtrlxDataLayerHwInterface::on_configure(
+hardware_interface::CallbackReturn DataLayerHardwareInterface_NRT::on_configure(
     const rclcpp_lifecycle::State & /*previous_state*/)
 {
-    RCLCPP_INFO(rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Configuring ...");
+    RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Configuring ...");
 
     // Beginning of code for ctrlX Data Layer
     // TODO(Manuel) Add setting of initial values
     RCLCPP_INFO(
-        rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Starting ctrlX Data Layer system (without broker)");
+        rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Starting ctrlX Data Layer system (without broker)");
     datalayerSystem_ = new comm::datalayer::DatalayerSystem;
     datalayerSystem_->start(false); 
     RCLCPP_INFO(
-        rclcpp::get_logger("CtrlxDataLayerHwInterface"), "DatalayerSystem created. Get connection string.");
+        rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "DatalayerSystem created. Get connection string.");
 
     auto connectionString = getConnectionString();
     RCLCPP_INFO(
-        rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Connection string is: %s ...", connectionString.c_str());
+        rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Connection string is: %s ...", connectionString.c_str());
 
     datalayerClientSharedPtr_ = datalayerSystem_->factory()->createClient3(connectionString);
     RCLCPP_INFO(
-        rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Created client to data layer.");
+        rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Created client to data layer.");
 
     RCLCPP_INFO(
-        rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Checking if connected ...");
+        rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Checking if connected ...");
 
     if(!datalayerClientSharedPtr_->isConnected())
     {
         RCLCPP_ERROR(
-            rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Failed to connect to Data Layer");
+            rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Failed to connect to Data Layer");
         return hardware_interface::CallbackReturn::ERROR;
     }
     RCLCPP_INFO(
-        rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Connected to datalayer");
+        rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Connected to datalayer");
 
     RCLCPP_INFO(
-        rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Get initial values from Datalayer for the interfaces.");
+        rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Get initial values from Datalayer for the interfaces.");
 
     for (auto & [name, dl_type] : state_interface_to_states_dl_)
     {
@@ -60,11 +60,11 @@ hardware_interface::CallbackReturn CtrlxDataLayerHwInterface::on_configure(
         if(ret != hardware_interface::return_type::OK)
         {
             RCLCPP_INFO(
-                rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Failed to get initial value for CommandInteface<%s>.", name.c_str());
+                rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Failed to get initial value for CommandInteface<%s>.", name.c_str());
             return hardware_interface::CallbackReturn::ERROR;
         }
         RCLCPP_INFO(
-            rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Get initial values from StateInteface<%s> which is:{%f}", name.c_str(), dl_type.value);
+            rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Get initial values from StateInteface<%s> which is:{%f}", name.c_str(), dl_type.value);
     }
 
     for (auto & [name, dl_type] : command_interface_to_commands_dl_)
@@ -73,23 +73,23 @@ hardware_interface::CallbackReturn CtrlxDataLayerHwInterface::on_configure(
         if(ret != hardware_interface::return_type::OK)
         {
             RCLCPP_INFO(
-                rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Failed to get initial value for CommandInteface<%s>.", name.c_str());
+                rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Failed to get initial value for CommandInteface<%s>.", name.c_str());
             return hardware_interface::CallbackReturn::ERROR;
         }
         RCLCPP_INFO(
-            rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Get initial values from CommandInteface<%s> which is:{%f}", name.c_str(), dl_type.value);
+            rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Get initial values from CommandInteface<%s> which is:{%f}", name.c_str(), dl_type.value);
     }
 
     RCLCPP_INFO(
-        rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Successfull configure the CtrlxDataLayerHwInterface.");
+        rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Successfull configure the DataLayerHardwareInterface_NRT.");
 
     return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-std::vector<hardware_interface::StateInterface> CtrlxDataLayerHwInterface::export_state_interfaces()
+std::vector<hardware_interface::StateInterface> DataLayerHardwareInterface_NRT::export_state_interfaces()
 {
     std::vector<hardware_interface::StateInterface> state_interfaces;
-    RCLCPP_INFO(rclcpp::get_logger("CtrlxDataLayerHwInterface"), "State interfaces:");
+    RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "State interfaces:");
 
     const std::string datalayer_base_address = info_.hardware_parameters["datalayer_base_address"];
     for (hardware_interface::ComponentInfo gpio : info_.gpios)
@@ -120,26 +120,26 @@ std::vector<hardware_interface::StateInterface> CtrlxDataLayerHwInterface::expor
             if (state_if.data_type == "bool")
             {
                 auto type = comm::datalayer::VariantType::BOOL8;
-                state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, CtrlxDatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
-                RCLCPP_INFO(rclcpp::get_logger("CtrlxDataLayerHwInterface"), "creating a StateInteface for type <bool> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
+                state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <bool> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
             }
             else if (state_if.data_type == "int")
             {
                 auto type = comm::datalayer::VariantType::INT64;
-                   state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, CtrlxDatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
-                RCLCPP_INFO(rclcpp::get_logger("CtrlxDataLayerHwInterface"), "creating a StateInteface for type <int> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
+                   state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <int> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
             }
             else if (state_if.data_type == "double")
             {
                 auto type = comm::datalayer::VariantType::FLOAT64;                    
-                state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, CtrlxDatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
-                RCLCPP_INFO(rclcpp::get_logger("CtrlxDataLayerHwInterface"), "creating a StateInteface for type <double> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
+                state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <double> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
             }
             else
             {
                 std::string error_msg = std::string("Invalid data type <" + state_if.data_type + "> for StateInteface:" + full_qualified_state_if_name);
                 RCLCPP_ERROR(
-                    rclcpp::get_logger("CtrlxDataLayerHwInterface"), error_msg.c_str());
+                    rclcpp::get_logger("DataLayerHardwareInterface_NRT"), error_msg.c_str());
                 throw std::runtime_error(error_msg);
             }
 
@@ -148,16 +148,16 @@ std::vector<hardware_interface::StateInterface> CtrlxDataLayerHwInterface::expor
         }
     }
     RCLCPP_INFO(
-                rclcpp::get_logger("CtrlxDataLayerHwInterface"), "successfully exported state interfaces");
+                rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "successfully exported state interfaces");
 
     return state_interfaces;
 }
 
-std::vector<hardware_interface::CommandInterface> CtrlxDataLayerHwInterface::export_command_interfaces()
+std::vector<hardware_interface::CommandInterface> DataLayerHardwareInterface_NRT::export_command_interfaces()
 {
     std::vector<hardware_interface::CommandInterface> command_interfaces;
 
-    RCLCPP_INFO(rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Command interfaces:");
+    RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Command interfaces:");
 
     const std::string datalayer_base_address = info_.hardware_parameters["datalayer_base_address"];
     for (hardware_interface::ComponentInfo gpio : info_.gpios)
@@ -180,26 +180,26 @@ std::vector<hardware_interface::CommandInterface> CtrlxDataLayerHwInterface::exp
             if (command_if.data_type == "bool")
             {
                 auto type = comm::datalayer::VariantType::BOOL8;                   
-                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, CtrlxDatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
-                RCLCPP_INFO(rclcpp::get_logger("CtrlxDataLayerHwInterface"), "creating a CommandInteface for type <bool> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
+                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <bool> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
             }
             else if (command_if.data_type == "int")
             {
                 auto type = comm::datalayer::VariantType::INT64;
-                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, CtrlxDatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
-                RCLCPP_INFO(rclcpp::get_logger("CtrlxDataLayerHwInterface"), "creating a CommandInteface for type <int> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
+                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <int> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
             }
             else if (command_if.data_type == "double")
             {
                 auto type = comm::datalayer::VariantType::FLOAT64;                 
-                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, CtrlxDatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
-                RCLCPP_INFO(rclcpp::get_logger("CtrlxDataLayerHwInterface"), "creating a CommandInteface for type <double> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
+                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <double> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
             }
             else
             {
                 std::string error_msg = std::string("Invalid data type <" + command_if.data_type + "> for CommandInterface:" + full_qualified_command_if_name);
                 RCLCPP_ERROR(
-                    rclcpp::get_logger("CtrlxDataLayerHwInterface"), error_msg.c_str());
+                    rclcpp::get_logger("DataLayerHardwareInterface_NRT"), error_msg.c_str());
                 throw std::runtime_error(error_msg);
             }
             command_interfaces.emplace_back(hardware_interface::CommandInterface(
@@ -208,37 +208,37 @@ std::vector<hardware_interface::CommandInterface> CtrlxDataLayerHwInterface::exp
     }
 
     RCLCPP_INFO(
-                rclcpp::get_logger("CtrlxDataLayerHwInterface"), "successfully exported command interfaces");
+                rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "successfully exported command interfaces");
 
     return command_interfaces;
 }
 
-hardware_interface::CallbackReturn CtrlxDataLayerHwInterface::on_activate(
+hardware_interface::CallbackReturn DataLayerHardwareInterface_NRT::on_activate(
     const rclcpp_lifecycle::State & /*previous_state*/)
 {
     // add code to activate
-    RCLCPP_INFO(rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Successfully activated!");
+    RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Successfully activated!");
     // datalayerSystem_->start(false); // TODO (Sachin) : Check the functionality of the start method
     return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-hardware_interface::CallbackReturn CtrlxDataLayerHwInterface::on_deactivate(
+hardware_interface::CallbackReturn DataLayerHardwareInterface_NRT::on_deactivate(
     const rclcpp_lifecycle::State & /*previous_state*/)
 {
     // add code to deactivate
     // datalayerSystem_->stop(false); // TODO (Sachin) : Check the functionality of the stop method
-    RCLCPP_INFO(rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Successfully deactivated!");
+    RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Successfully deactivated!");
     return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-hardware_interface::return_type CtrlxDataLayerHwInterface::read_from_datalayer(const std::string& interface_name, CtrlxDatalayerType& datalayer_wrapper)
+hardware_interface::return_type DataLayerHardwareInterface_NRT::read_from_datalayer(const std::string& interface_name, DatalayerType& datalayer_wrapper)
 {
 
     // check if connection is still there
     if(!datalayerClientSharedPtr_->isConnected())
     {
         RCLCPP_ERROR(
-                rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Connection to datalayer lost!");
+                rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Connection to datalayer lost!");
         return hardware_interface::return_type::ERROR;
 
     }
@@ -249,7 +249,7 @@ hardware_interface::return_type CtrlxDataLayerHwInterface::read_from_datalayer(c
     if (result != DL_OK)
     {
         RCLCPP_WARN(
-            rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Failed to read from Data Layer on address<%s>. Interface <%s> not updated.", datalayer_wrapper.address().c_str(), interface_name.c_str());
+            rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Failed to read from Data Layer on address<%s>. Interface <%s> not updated.", datalayer_wrapper.address().c_str(), interface_name.c_str());
         return hardware_interface::return_type::ERROR;
     }
     else 
@@ -261,7 +261,7 @@ hardware_interface::return_type CtrlxDataLayerHwInterface::read_from_datalayer(c
         else
         {
             RCLCPP_WARN(
-                rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Value of StateInterface <%s> at address: %s has unexpected type: %s. StateInterface not updated.",
+                rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Value of StateInterface <%s> at address: %s has unexpected type: %s. StateInterface not updated.",
                 interface_name.c_str(), datalayer_wrapper.address().c_str(), datalayerValue_.typeAsString().c_str());
             return hardware_interface::return_type::ERROR;
         }
@@ -270,7 +270,7 @@ hardware_interface::return_type CtrlxDataLayerHwInterface::read_from_datalayer(c
 }
 
 
-hardware_interface::return_type CtrlxDataLayerHwInterface::read(
+hardware_interface::return_type DataLayerHardwareInterface_NRT::read(
     const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
     
@@ -295,7 +295,7 @@ hardware_interface::return_type CtrlxDataLayerHwInterface::read(
     return hardware_interface::return_type::OK;
 }
 
-hardware_interface::return_type CtrlxDataLayerHwInterface::write(
+hardware_interface::return_type DataLayerHardwareInterface_NRT::write(
     const rclcpp::Time &/*time*/, const rclcpp::Duration & /*period*/)
 {
 
@@ -308,29 +308,29 @@ hardware_interface::return_type CtrlxDataLayerHwInterface::write(
         if (STATUS_FAILED(result))
         {
             RCLCPP_WARN(
-                rclcpp::get_logger("CtrlxDataLayerHwInterface"), "Failed to write value {%f} of CommandInterface<%s>", dl_type.value, name.c_str());
+                rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "Failed to write value {%f} of CommandInterface<%s>", dl_type.value, name.c_str());
         }
     }
     return hardware_interface::return_type::OK;
 }
 
 
-hardware_interface::CallbackReturn CtrlxDataLayerHwInterface::on_cleanup(
+hardware_interface::CallbackReturn DataLayerHardwareInterface_NRT::on_cleanup(
     const rclcpp_lifecycle::State & /*previous_state*/)
 {
     // add code to cleanup
     return hardware_interface::CallbackReturn::SUCCESS;
 }
 
-hardware_interface::CallbackReturn CtrlxDataLayerHwInterface::on_error(
+hardware_interface::CallbackReturn DataLayerHardwareInterface_NRT::on_error(
     const rclcpp_lifecycle::State & /*previous_state*/)
 {
     // add code to handle error
     return hardware_interface::CallbackReturn::SUCCESS;
 }
-} // namespace ctrlx_data_layer_hw_interface
+} // namespace datalayer_hardware_interface
 
 
 #include "pluginlib/class_list_macros.hpp"
 
-PLUGINLIB_EXPORT_CLASS(ctrlx_data_layer_hw_interface::CtrlxDataLayerHwInterface, hardware_interface::SystemInterface)
+PLUGINLIB_EXPORT_CLASS(datalayer_hardware_interface::DataLayerHardwareInterface_NRT, hardware_interface::SystemInterface)

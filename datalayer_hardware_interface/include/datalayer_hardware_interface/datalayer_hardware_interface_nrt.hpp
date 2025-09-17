@@ -60,19 +60,19 @@ static std::string getConnectionString(
   return connectionString + std::string("?sslport=") + std::to_string(sslPort);
 }
 
-class CtrlxDatalayerType
+class DatalayerType
 {
   public:
-    explicit CtrlxDatalayerType(const double& value, const comm::datalayer::VariantType& type, const std::string& address)
+    explicit DatalayerType(const double& value, const comm::datalayer::VariantType& type, const std::string& address)
       : value(value), type_(type), address_(address)
     {
       if(!is_supported_type(type_))
       {
-        throw std::invalid_argument("Failed to initialize the CtrlxDatalayerType because the type you passed it not supported.");
+        throw std::invalid_argument("Failed to initialize the DatalayerType because the type you passed it not supported.");
       }
       if(address_.empty())
       {
-        throw std::invalid_argument("Failed to initialize the CtrlxDatalayerType because of an empty address.");
+        throw std::invalid_argument("Failed to initialize the DatalayerType because of an empty address.");
       }
     }
 
@@ -143,7 +143,7 @@ class CtrlxDatalayerType
       const std::string address_;
 };
 
-class CtrlxDataLayerHwInterface : public hardware_interface::SystemInterface
+class DataLayerHardwareInterface_NRT : public hardware_interface::SystemInterface
 {
 public:
     hardware_interface::CallbackReturn on_init(
@@ -175,17 +175,13 @@ public:
       const rclcpp_lifecycle::State & previous_state) override;
 
 protected:
-  hardware_interface::return_type read_from_datalayer(const std::string& interface_name, CtrlxDatalayerType& datalayer_wrapper);
+  hardware_interface::return_type read_from_datalayer(const std::string& interface_name, DatalayerType& datalayer_wrapper);
 
 private:
-  const std::string datalayer_data_input_ = "input/data/";
-  const std::string datalayer_data_output_ = "output/data/";
-  std::string datalayer_base_address_;
-  std::unordered_map<std::string, std::string> state_interface_to_states_;
-  std::unordered_map<std::string, std::string> command_interface_to_commands_;
+  comm::datalayer::VariantType variantTypeFromString(const std::string& type_str);
 
-  std::unordered_map<std::string, CtrlxDatalayerType> state_interface_to_states_dl_;
-  std::unordered_map<std::string, CtrlxDatalayerType> command_interface_to_commands_dl_;
+  std::unordered_map<std::string, DatalayerType> state_interface_to_states_dl_;
+  std::unordered_map<std::string, DatalayerType> command_interface_to_commands_dl_;
 
   // Shared Ptr for datalayer
   comm::datalayer::IClient3 *datalayerClientSharedPtr_;
@@ -196,6 +192,6 @@ private:
 
   comm::datalayer::Variant datalayerValueWrite_; 
 };
-} // namespace ctrlx_data_layer_hw_interface
+} // namespace datalayer_hardware_interface
 
 #endif  // CTRLX_DATA_LAYER_HW_INTERFACE__CTRLX_DATA_LAYER_HW_INTERFACE_HPP_
