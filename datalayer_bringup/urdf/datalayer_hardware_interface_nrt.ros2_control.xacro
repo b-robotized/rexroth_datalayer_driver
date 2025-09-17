@@ -8,14 +8,17 @@
     <ros2_control name="DataLayerHwInterface" type="system">
       <hardware>
         <plugin>datalayer_hardware_interface/DataLayerHardwareInterface_NRT</plugin>
+        <param name="device_ip">127.0.0.1</param>
+        <param name="device_user">boschrexroth</param>
+        <param name="device_password">boschrexroth</param>
       </hardware>
 
       <!--Addresses MUST ommit stating and ending backslash-->
       <gpio name="datalayer/scheduler">
         <xacro:state_interface_DataLayer_NRT 
           name="scheduler_counter" DL_address="scheduler/admin/info/common-data-rt" DL_variable="counter"/>
-        <xacro:comand_interface_DataLayer_NRT initial_value="1.0"
-          name="ping_timeout" DL_address="datalayer/server/settings" DL_variable="​serverIdlePingTimeout​"/>
+        <!-- <xacro:comand_interface_DataLayer_NRT initial_value="1.0"
+          name="ping_timeout" DL_address="datalayer/server/settings" DL_variable="​serverIdlePingTimeout​"/> -->
       </gpio>
     </ros2_control>
   </xacro:macro>

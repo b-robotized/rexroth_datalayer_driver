@@ -1,11 +1,8 @@
 #ifndef CTRLX_DATA_LAYER_HW_INTERFACE__CTRLX_DATA_LAYER_HW_INTERFACE_HPP_
 #define CTRLX_DATA_LAYER_HW_INTERFACE__CTRLX_DATA_LAYER_HW_INTERFACE_HPP_
 
-#include <stdexcept>
-#include <limits>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 
@@ -20,7 +17,7 @@
 #include "comm/datalayer/datalayer.h"
 #include "comm/datalayer/datalayer_system.h"
 
-namespace ctrlx_data_layer_hw_interface 
+namespace datalayer_hardware_interface 
 {
 //! Retrieve environment variable SNAP
 //! @result The content of SNAP ales nullptr if not available
