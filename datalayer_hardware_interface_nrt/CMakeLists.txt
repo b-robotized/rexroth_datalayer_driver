@@ -45,6 +45,9 @@ target_include_directories ( ${PROJECT_NAME}
 
 ########################################################
 # Plugin export
+
+pluginlib_export_plugin_description_file(hardware_interface datalayer_hardware_interface_nrt.xml)
+
 install(
   DIRECTORY include/
   DESTINATION include
