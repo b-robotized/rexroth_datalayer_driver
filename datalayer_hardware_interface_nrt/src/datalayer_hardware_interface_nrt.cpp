@@ -1,4 +1,4 @@
-#include "datalayer_hardware_interface/datalayer_hardware_interface_nrt.hpp"
+#include "datalayer_hardware_interface_nrt/datalayer_hardware_interface_nrt.hpp"
 
 #include <limits>
 
@@ -120,25 +120,25 @@ std::vector<hardware_interface::StateInterface> DataLayerHardwareInterface_NRT::
             if (dl_variable_type_str == "BOOL8")
             {
                 auto type = comm::datalayer::VariantType::BOOL8;
-                state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, full_address)));
                 RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <BOOL8> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
             }
             else if (dl_variable_type_str == "INT64")
             {
                 auto type = comm::datalayer::VariantType::INT64;
-                   state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                   state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, full_address)));
                 RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <INT64> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
             }
             else if (dl_variable_type_str == "UINT64")
             {
                 auto type = comm::datalayer::VariantType::UINT64;
-                   state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                   state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, full_address)));
                 RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <UINT64> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
             }
             else if (dl_variable_type_str == "FLOAT64")
             {
                 auto type = comm::datalayer::VariantType::FLOAT64;                    
-                state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                state_interface_to_states_dl_.emplace(std::make_pair(full_qualified_state_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, full_address)));
                 RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a StateInteface for type <FLOAT64> that maps from [%s, %s]", full_qualified_state_if_name.c_str(), state_interface_to_states_dl_.at(full_qualified_state_if_name).address().c_str());
             }
             else
@@ -169,6 +169,7 @@ std::vector<hardware_interface::CommandInterface> DataLayerHardwareInterface_NRT
     for (hardware_interface::ComponentInfo gpio : info_.gpios)
     {
         // TODO(Manuel) Add setting of initial values
+        const std::string device_name = gpio.name;
         for (auto & command_if : gpio.command_interfaces)
         {            
             std::string dl_address_str = command_if.parameters.at("DL_address");
@@ -189,25 +190,25 @@ std::vector<hardware_interface::CommandInterface> DataLayerHardwareInterface_NRT
             if (dl_variable_type_str == "BOOL8")
             {
                 auto type = comm::datalayer::VariantType::BOOL8;                   
-                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, full_address)));
                 RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <BOOL8> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
             }
             else if (dl_variable_type_str == "INT64")
             {
                 auto type = comm::datalayer::VariantType::INT64;
-                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, full_address)));
                 RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <INT64> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
             }
             else if (dl_variable_type_str == "UINT64")
             {
                 auto type = comm::datalayer::VariantType::UINT64;
-                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, full_address)));
                 RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <UINT64> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
             }
             else if (dl_variable_type_str == "FLOAT64")
             {
                 auto type = comm::datalayer::VariantType::FLOAT64;                 
-                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, address)));
+                command_interface_to_commands_dl_.emplace(std::make_pair(full_qualified_command_if_name, DatalayerType(std::numeric_limits<double>::quiet_NaN(), type, full_address)));
                 RCLCPP_INFO(rclcpp::get_logger("DataLayerHardwareInterface_NRT"), "creating a CommandInteface for type <FLOAT64> that maps from [%s, %s]", full_qualified_command_if_name.c_str(), command_interface_to_commands_dl_.at(full_qualified_command_if_name).address().c_str());
             }
             else
