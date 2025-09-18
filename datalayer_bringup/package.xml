@@ -8,7 +8,6 @@
   <license>Apache 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
-  <exec_depend>datalayer_hardware_interface_nrt</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>
