@@ -16,9 +16,10 @@ foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
 endforeach()
 
-# Root of the ctrlx SDK
+
 set (SDK_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../../..)
 MESSAGE("SDK_ROOT_DIR: ${SDK_ROOT_DIR}")
+# Include directories
 SET ( PRIVATE_INCLUDE_DIRS
   ${CMAKE_CURRENT_LIST_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -34,7 +35,8 @@ add_library(
   SHARED
   src/${PROJECT_NAME}.cpp
 )
-ament_target_dependencies(${PROJECT_NAME} ${THIS_PACKAGE_INCLUDE_DEPENDS})
+ament_target_dependencies(${PROJECT_NAME} 
+  ${THIS_PACKAGE_INCLUDE_DEPENDS})
 
 target_include_directories ( ${PROJECT_NAME}
   PRIVATE ${PRIVATE_INCLUDE_DIRS}
@@ -42,6 +44,27 @@ target_include_directories ( ${PROJECT_NAME}
     $<INSTALL_INTERFACE:include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 )
+
+# Link against libcomm_datalayer.so
+find_library(COMM_DATALAYER_LIBRARY
+  NAMES comm_datalayer
+  HINTS ${SDK_ROOT_DIR}/bin/comm.datalayer/ubuntu22-gcc-x64
+)
+target_link_libraries(${PROJECT_NAME}
+  ${COMM_DATALAYER_LIBRARY}
+)
+
+# When the resulting .so is copied into the bundle, make sure we know where to look for the libcomm_datalayer.so
+# depending on where it is copied during bundle build: https://en.wikipedia.org/wiki/Rpath.
+# default is $ORIGIN, the same dir as the datalayer_hardware_interface_nrt.so
+set(BUNDLE_SDK_DEP_RPATH "$ORIGIN" CACHE STRING 
+  "Path to ctrlX SDK dependencies within the final bundle.")
+
+message(STATUS "Hardware Interface: INSTALL_RPATH will be set to '${BUNDLE_SDK_DEP_RPATH}'")
+set_target_properties(datalayer_hardware_interface_nrt PROPERTIES
+  INSTALL_RPATH "${BUNDLE_SDK_DEP_RPATH}"
+)
+
 
 ########################################################
 # Plugin export
