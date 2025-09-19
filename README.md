@@ -10,10 +10,9 @@ This hardware interface is designed to map `ros2_control` interfaces to Data Lay
 
 ### Prerequisites
 
-1.  **Bosch Rexroth ctrlX AUTOMATION SDK**: This hardware interface is built against the public SDK. You must have the SDK installed and sourced in your development environment.
-    * **[INSERT LINK TO SDK HERE]**
+1.  [**Bosch Rexroth ctrlX AUTOMATION SDK**](https://github.com/boschrexroth/ctrlx-automation-sdk/pkgs/nuget/ctrlX-DataLayer): This hardware interface is built against the public SDK. You must have the SDK installed and sourced in your development environment.
 
-2.  **Execution Environment**: This driver **must** be run on the ctrlX device itself (e.g., a ctrlX CORE or COREvirtual), so the datalayer is instantiated.
+2. [**Execution Environment**](https://community.boschrexroth.com/ctrlx-automation-how-tos-qmglrz33/post/setting-up-a-ctrlx-corevirtual-xCDAv6Ax0fcyiDc): This driver **must** be run on the ctrlX device itself (e.g., a ctrlX CORE or COREvirtual), so the datalayer is instantiated.
 
 3.  **ROS2 Control Snap**: The current version of this driver relies on Inter-Process Communication (IPC) to connect to the Data Layer. The `datalayer` SDK supports TCP, but due to firewall and security reasons, it is not enabled. Therefore, your `ros2_control` node must be packaged and run as a snap on the ctrlX device to have access to the necessary communication channels.
 
@@ -23,12 +22,12 @@ This hardware interface is designed to map `ros2_control` interfaces to Data Lay
 
 1.  Clone this repository into your ROS2 workspace:
     ```bash
-    git clone [INSERT REPO URL HERE] src/rexroth_datalayer_driver
+    git clone https://github.com/b-robotized/rexroth_datalayer_driver.git src/rexroth_datalayer_driver
     ```
 
 2.  Build the workspace:
     ```bash
-    colcon build --packages-select datalayer_hardware_interface_nrt --cmake-args -DBUNDLE_SDK_DEP_RPATH=/my/path/to/lib
+    colcon build --packages-select datalayer_bringup datalayer_hardware_interface_nrt --cmake-args -DBUNDLE_SDK_DEP_RPATH=/my/path/to/lib
     ```
 
   During build, `BUNDLE_SDK_DEP_RPATH` must be specified. This ensures that the compiled hardware interface `.so` can find the required Data Layer libraries (`libcomm_datalayer.so`) at runtime.
@@ -66,7 +65,7 @@ The hardware interface currently supports the following `comm::datalayer::Varian
 * `FLOAT64`
 
 #### Example URDF Configuration:
-Example urdf configuration can be found in the accompanying `datalayer_bringup` package LINK.
+Example URDF configuration can be found in the [accompanying `datalayer_bringup` package](datalayer_bringup/urdf/datalayer_hardware_interface_nrt.ros2_control.xacro).
 
 Note: for now, ***Only `<gpio>` component is supported!***
 
@@ -88,7 +87,7 @@ Note: for now, ***Only `<gpio>` component is supported!***
             <param name="DL_address">scheduler/admin/info/common-data-rt</param>
             <param name="DL_variable">counter</param>
             <param name="DL_variable_type">UINT64</param>
-        </state_interface>w
+        </state_interface>
 
     </gpio>
 </ros2_control>
