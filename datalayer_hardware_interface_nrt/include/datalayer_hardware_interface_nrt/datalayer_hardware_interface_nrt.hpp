@@ -131,6 +131,7 @@ class DatalayerType
     {   
       if(variant_type == comm::datalayer::VariantType::BOOL8 ||
         variant_type == comm::datalayer::VariantType::INT64 ||
+        variant_type == comm::datalayer::VariantType::UINT64 ||
         variant_type == comm::datalayer::VariantType::FLOAT64)
         {
           return true;
